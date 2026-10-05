@@ -1,0 +1,1705 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Risikomanagement-Matrix (DE) – Leitungen, Umspannwerke, Thermo & Kohle→Gas</title>
+
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#e9efff; --accent:#64b5f6;
+      --good:#2ecc71; --warn:#f1c40f; --bad:#e67e22; --crit:#e74c3c;
+      --line:#233255; --chip:#1a2542;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    body{ margin:0; font-family:var(--sans); background:linear-gradient(180deg,#070c16, var(--bg)); color:var(--text); }
+    header{
+      padding:18px 16px; border-bottom:1px solid var(--line);
+      background:rgba(17,26,46,.7); backdrop-filter: blur(6px); position:sticky; top:0; z-index:10;
+    }
+    header h1{ margin:0; font-size:16px; font-weight:700; letter-spacing:.2px; }
+    header .sub{ margin-top:6px; color:var(--muted); font-size:12px; line-height:1.35; }
+    main{ max-width:1200px; margin:0 auto; padding:16px; }
+    .grid{ display:grid; grid-template-columns: 1fr; gap:12px; }
+    @media (min-width: 1000px){ .grid{ grid-template-columns: 1.1fr .9fr; } }
+    .card{ background:rgba(17,26,46,.85); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow: 0 8px 28px rgba(0,0,0,.25); }
+    h2{ margin:0 0 10px 0; font-size:14px; }
+    h3{ margin:10px 0 8px 0; font-size:13px; color:#dbe6ff; }
+    .muted{ color:var(--muted); font-size:12px; line-height:1.45; }
+    .row{ display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
+    label{ font-size:12px; color:#dbe6ff; }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea{
+      background:#0b1327; color:var(--text); border:1px solid var(--line);
+      border-radius:10px; padding:8px 10px; font-size:12px; outline:none;
+    }
+    input[type="number"]{ width:68px; }
+    textarea{ width:100%; min-height:58px; resize:vertical; }
+    button{
+      background: linear-gradient(180deg, #2a6df4, #1d4ed8);
+      border:1px solid rgba(100,181,246,.35); color:#fff; padding:9px 12px; border-radius:10px;
+      cursor:pointer; font-size:12px; font-weight:700;
+    }
+    button.secondary{ background:#0b1327; border:1px solid var(--line); color:var(--text); font-weight:600; }
+    button:disabled{ opacity:.55; cursor:not-allowed; }
+    fieldset{ border:1px solid var(--line); border-radius:12px; padding:10px; margin:10px 0; }
+    legend{ padding:0 8px; color:#dbe6ff; font-size:12px; font-weight:700; }
+    .checks{ display:grid; grid-template-columns:1fr; gap:7px; }
+    @media (min-width: 800px){ .checks{ grid-template-columns:1fr 1fr; } }
+    .check{
+      display:flex; align-items:flex-start; gap:8px; padding:7px 8px; border-radius:10px;
+      background: rgba(10,16,32,.55); border:1px solid rgba(35,50,85,.6);
+    }
+    .check input{ margin-top:2px; }
+    .check .t{ font-size:12px; line-height:1.25; }
+    .chip{ display:inline-block; background:var(--chip); border:1px solid rgba(35,50,85,.9); padding:2px 8px; border-radius:999px; font-size:11px; color:#dbe6ff; }
+    .mono{ font-family:var(--mono); font-size:11px; color:#cfe1ff; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid var(--line); }
+    th, td{ border-bottom:1px solid var(--line); padding:8px 8px; vertical-align:top; }
+    th{ position:sticky; top:58px; background:#0f1933; font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#bcd1ff; z-index:5;}
+    td{ font-size:12px; }
+    tr:last-child td{ border-bottom:none; }
+    .lvl{ font-weight:800; padding:2px 8px; border-radius:999px; display:inline-block; font-size:11px; border:1px solid rgba(255,255,255,.1); }
+    .lvl.low{ background:rgba(46,204,113,.16); color:#b7f3cd; border-color:rgba(46,204,113,.35); }
+    .lvl.med{ background:rgba(241,196,15,.16); color:#ffeaa7; border-color:rgba(241,196,15,.35); }
+    .lvl.high{ background:rgba(230,126,34,.16); color:#ffd3a8; border-color:rgba(230,126,34,.35); }
+    .lvl.crit{ background:rgba(231,76,60,.16); color:#ffb4ad; border-color:rgba(231,76,60,.35); }
+    .critical-row{ outline:2px solid rgba(231,76,60,.35); background:rgba(231,76,60,.06); }
+    .small{ font-size:11px; color:var(--muted); line-height:1.35; }
+    .footer-note{ margin-top:10px; font-size:11px; color:var(--muted); line-height:1.45; }
+    .split{ display:grid; grid-template-columns: 1fr; gap:12px; }
+    @media (min-width: 1000px){ .split{ grid-template-columns: 1fr 1fr; } }
+    .tools{ display:flex; gap:8px; flex-wrap:wrap; }
+  </style>
+
+  <!-- PDF libs (client-side). Für Offline: lokal speichern und Pfade anpassen -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.29/dist/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+<header>
+  <h1>Parametrische Risikomanagement‑Matrix (Deutschland) – Leitungen, Umspannwerke, Thermo &amp; Kohle→Gas</h1>
+  <div class="sub">
+    Vollständig clientseitig (HTML/JS). Checkboxen aktivieren automatisch <span class="chip">Anforderungen</span>, <span class="chip">Risiken</span>,
+    <span class="chip">Maßnahmen</span> und <span class="chip">Terminplan inkl. kritischem Pfad (CPM)</span>.<br/>
+    Hinweis: Bundesland-/Behördenpraxis, Betreiber-/TSO/DSO-Spezifika und Verträge müssen projektspezifisch ergänzt werden. Keine Rechtsberatung.
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>1) Projektkonfiguration (Checkboxen = Trigger)</h2>
+
+      <div class="row">
+        <label>Projektname<br/>
+          <input id="projectName" type="text" placeholder="z.B. Leitung + Umspannwerk + Kohle→Gas" style="min-width:320px"/>
+        </label>
+        <label>Projektstart (für CPM &amp; SLA)<br/>
+          <input id="projectStart" type="date"/>
+        </label>
+        <label>Risikobewertung – Schwellen<br/>
+          <select id="thresholdPreset">
+            <option value="default" selected>Standard (1–4 niedrig, 5–9 mittel, 10–16 hoch, 17–25 kritisch)</option>
+            <option value="conservative">Konservativ (1–3 niedrig, 4–8 mittel, 9–15 hoch, 16–25 kritisch)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="tools" style="margin-top:10px">
+        <button id="btnGenerate">Generieren / Aktualisieren</button>
+        <button class="secondary" id="btnSave">Konfiguration speichern (localStorage)</button>
+        <button class="secondary" id="btnLoad">Konfiguration laden</button>
+        <button class="secondary" id="btnReset">Reset</button>
+      </div>
+
+      <fieldset>
+        <legend>Module / Umfang</legend>
+        <div class="checks" id="group_scope"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Genehmigungen / Verfahren</legend>
+        <div class="checks" id="group_permitting"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Umwelt / Raum / Sensitivitäten</legend>
+        <div class="checks" id="group_environment"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Prozess-/Anlagensicherheit &amp; Industrie</legend>
+        <div class="checks" id="group_process"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Netz / Betrieb / OT-IT</legend>
+        <div class="checks" id="group_grid"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Bau / HSE</legend>
+        <div class="checks" id="group_hse"></div>
+      </fieldset>
+
+      <div class="footer-note">
+        Methodik: angelehnt an DIN EN ISO 31000 / IEC 31010. Referenzen als Trigger (keine Rechtsberatung).
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2) Status &amp; Kurzüberblick</h2>
+      <div class="split">
+        <div class="card" style="padding:12px; background:rgba(10,16,32,.55)">
+          <h3>Aktivierte Merkmale</h3>
+          <div id="activeFeatures" class="small">—</div>
+        </div>
+        <div class="card" style="padding:12px; background:rgba(10,16,32,.55)">
+          <h3>Ergebniszähler</h3>
+          <div class="small" id="counts">—</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <h3>Export</h3>
+        <div class="tools">
+          <button class="secondary" id="btnExportReq">CSV: Anforderungen</button>
+          <button class="secondary" id="btnExportRisk">CSV: Risiken</button>
+          <button class="secondary" id="btnExportSched">CSV: Terminplan</button>
+          <button class="secondary" id="btnExportJSON">JSON: Alles</button>
+          <button id="btnExportPDF">PDF: Abschlussbericht</button>
+        </div>
+        <div class="small" style="margin-top:8px">
+          CSV/JSON/PDF wird lokal im Browser generiert (keine Server-Kommunikation).
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:12px">
+    <h2>3) Anwendbare Anforderungen (Legal/Normen Register)</h2>
+    <div class="muted">Automatisch gefiltert nach ausgewählten Merkmalen. „Evidenzen/Deliverables“ dienen als Nachweislogik.</div>
+    <div style="margin-top:10px; overflow:auto">
+      <table id="tblReq">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Thema</th>
+            <th>Referenz (DE/EU / Norm)</th>
+            <th>Pflicht / Zweck</th>
+            <th>Evidenzen / Deliverables</th>
+            <th>Trigger</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:12px">
+    <h2>4) Risikoregister (P×I) mit Maßnahmen (automatisch zugeordnet)</h2>
+    <div class="muted">P und I (1–5) können pro Risiko überschrieben werden. Score &amp; Stufe werden live berechnet.</div>
+    <div style="margin-top:10px; overflow:auto">
+      <table id="tblRisk">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Kategorie</th>
+          <th>Risiko</th>
+          <th>Ursache/Trigger</th>
+          <th>Bezug (Anforderungen)</th>
+          <th>P</th>
+          <th>I</th>
+          <th>Score</th>
+          <th>Stufe</th>
+          <th>Prävention (Standard)</th>
+          <th>Monitoring</th>
+          <th>Kontingenz</th>
+          <th>Owner (Rolle)</th>
+          <th>Phase/Gate</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:12px">
+    <h2>5) Terminplan (WBS‑Tätigkeiten) inkl. Kritischer Pfad (CPM)</h2>
+    <div class="muted">Dauer ist editierbar; danach „Generieren/Aktualisieren“ klicken. Kritische Vorgänge (Float = 0) werden hervorgehoben.</div>
+    <div style="margin-top:10px; overflow:auto">
+      <table id="tblSched">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tätigkeit</th>
+            <th>Modul</th>
+            <th>Dauer (Tage)</th>
+            <th>Vorgänger</th>
+            <th>ES</th>
+            <th>EF</th>
+            <th>LS</th>
+            <th>LF</th>
+            <th>Float</th>
+            <th>Kritisch</th>
+            <th>Deliverable</th>
+            <th>Owner (Rolle)</th>
+            <th>Gate</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="footer-note" id="schedNote"></div>
+  </section>
+</main>
+
+<script>
+/* ============================================================
+   0) FEATURE-LISTE (Checkboxen)
+   ============================================================ */
+const FEATURES = [
+  // Umfang
+  {id:"MOD_LINIE", group:"scope", label:"Übertragungs-/Hochspannungsleitung (Freileitung/Kabel)"},
+  {id:"MOD_UMSPANN", group:"scope", label:"Umspannwerk / Schaltanlage (AIS/GIS)"},
+  {id:"MOD_THERMO", group:"scope", label:"Thermisches Kraftwerk (Bestand/Neubau, z.B. GuD)"},
+  {id:"MOD_COAL2GAS", group:"scope", label:"Konversion Kohle → Gas (Umbau/Repowering)"},
+  {id:"MOD_GAS_CONN", group:"scope", label:"Gasanbindung / Gasnetz-Interface (Druck/Qualität/Kapazität)"},
+  {id:"MOD_SCADA", group:"scope", label:"Leittechnik/SCADA/Telekommunikation (OT)"},
+  {id:"MOD_DEMO", group:"scope", label:"Rückbau/Demontage/Abbruch im Bestand"},
+
+  // Genehmigungen
+  {id:"PERM_PLANFEST", group:"permitting", label:"Planfeststellungsverfahren / Linieninfrastruktur-Verfahren"},
+  {id:"PERM_BIMSCHG", group:"permitting", label:"Genehmigung nach BImSchG (Industrieanlage)"},
+  {id:"PERM_UVPG", group:"permitting", label:"UVP / EIA erforderlich (UVPG)"},
+  {id:"PERM_WHG", group:"permitting", label:"Wasserrechtliche Erlaubnis / WHG relevant"},
+  {id:"PERM_LBO", group:"permitting", label:"Baugenehmigung/ Landesbauordnung (LBO) relevant"},
+  {id:"PERM_DENKMAL", group:"permitting", label:"Denkmalschutz / archäologische Belange möglich"},
+
+  // Umwelt / Raum
+  {id:"ENV_NATURA", group:"environment", label:"Natura 2000 / FFH-Gebiete betroffen (BNatSchG/FFH)"},
+  {id:"ENV_SPECIES", group:"environment", label:"Arten-/Vogelschutz (Brut-/Zugzeiten, Kollisionsrisiko)"},
+  {id:"ENV_URBAN", group:"environment", label:"Urbanes/wohnnahes Umfeld (Lärm/Stakeholder)"},
+  {id:"ENV_WATER_CROSS", group:"environment", label:"Gewässerquerung / Uferzonen betroffen"},
+  {id:"ENV_WATER_PROT", group:"environment", label:"Wasserschutzgebiet / Grundwassersensitiv"},
+  {id:"ENV_FOREST", group:"environment", label:"Wald-/Forstflächen betroffen"},
+  {id:"ENV_SOIL_SUS", group:"environment", label:"Altlasten-/kontaminationsverdächtiger Boden (Verdacht)"},
+  {id:"ENV_COMP_MEAS", group:"environment", label:"Ausgleichs-/Ersatzmaßnahmen (Kompensation) erforderlich"},
+
+  // Prozess / Industrie
+  {id:"PROC_ATEX", group:"process", label:"ATEX-Zonen / Explosionsschutz relevant (Gas/Staub)"},
+  {id:"PROC_PED", group:"process", label:"Druckgeräte/Druckleitungen relevant (PED)"},
+  {id:"PROC_SIS", group:"process", label:"Sicherheitsinstrumentierte Systeme (SIS/SIL) erforderlich (IEC 61511)"},
+  {id:"PROC_STOERFALL", group:"process", label:"StörfallV / 12. BImSchV potenziell relevant (Seveso)"},
+  {id:"PROC_GEFSTOFF", group:"process", label:"Gefahrstoffe/chemische Medien relevant (GefStoffV/TRGS)"},
+  {id:"PROC_NOISE", group:"process", label:"Immissionsschutz Lärm/Schall relevant (TA Lärm)"},
+  {id:"PROC_AIR", group:"process", label:"Immissionsschutz Luft/Emissionen relevant (TA Luft, 13./44. BImSchV)"},
+  {id:"PROC_ETS", group:"process", label:"EU ETS / TEHG relevant (CO₂-Monitoring/Reporting)"},
+
+  // Netz / OT
+  {id:"GRID_TSO", group:"grid", label:"TSO/DSO-Anforderungen (Anschluss/Abnahme/Schutzkonzepte)"},
+  {id:"GRID_TELEPROT", group:"grid", label:"Teleprotektion / Schutzkommunikation erforderlich"},
+  {id:"GRID_BLACKSTART", group:"grid", label:"Betriebsanforderungen (z.B. Blackstart/Netzdienstleistungen) relevant"},
+  {id:"GRID_KRITIS", group:"grid", label:"KRITIS/BSI-Pflichten möglich (abhängig vom Betreiber/Schwellenwert)"},
+  {id:"GRID_CYBER", group:"grid", label:"OT-Cybersecurity (IEC 62443) explizit gefordert"},
+
+  // HSE / Bau
+  {id:"HSE_BAUSTELLV", group:"hse", label:"Baustellenverordnung (BaustellV) / SiGe‑Koordination erforderlich"},
+  {id:"HSE_HEIGHT", group:"hse", label:"Arbeiten in der Höhe (Masten, Stahlbau, Gerüste)"},
+  {id:"HSE_LIFTS", group:"hse", label:"Schwerlastheben/Heavy Lifting (Trafo, GIS, Turbine etc.)"},
+  {id:"HSE_UXO", group:"hse", label:"Kampfmittel/UXO‑Risiko möglich"},
+  {id:"HSE_ASBEST", group:"hse", label:"Asbest/Schadstoffe im Bestand (Rückbau) möglich"},
+  {id:"HSE_TRAFFIC", group:"hse", label:"Verkehrssicherung / Transportgenehmigungen relevant"},
+];
+
+/* ============================================================
+   1) BIBLIOTHEKEN: REQUIREMENTS / ACTION PLANS / RISKS / TASKS
+   ============================================================ */
+const REQUIREMENTS = [
+  { id:"REQ_ENWG_NABEG", theme:"Energie / Netz", ref:"EnWG; NABEG; BBPlG (ggf. EnLAG)",
+    desc:"Netz-/Leitungsvorhaben: energiewirtschaftlicher Rahmen, Netzausbau- und Beschleunigungsregeln.",
+    deliverables:"Genehmigungsstrategie; Verfahrensplan; Nachweise Netzanschluss/TSO-Interfaces",
+    all:["MOD_LINIE"], any:["PERM_PLANFEST","GRID_TSO"] },
+
+  { id:"REQ_UVPG", theme:"Genehmigung / Umwelt", ref:"UVPG (Umweltverträglichkeitsprüfung)",
+    desc:"UVP/EIA: Scoping, Umweltbericht, Beteiligung, Abwägung; kann saisonale Studien erzwingen.",
+    deliverables:"UVP-Scoping; UVP-Bericht; Einwendungsmanagement; Behördenentscheid",
+    all:["PERM_UVPG"], any:[] },
+
+  { id:"REQ_BNATSCHG_FFH", theme:"Naturschutz", ref:"BNatSchG; FFH-/Vogelschutz-RL (Natura 2000)",
+    desc:"FFH-Verträglichkeitsprüfung, Artenschutzprüfung, Vermeidungs-/Ausgleichsmaßnahmen.",
+    deliverables:"FFH-Prüfung; Artenschutzgutachten; Maßnahmenplan; Monitoringkonzept",
+    all:[], any:["ENV_NATURA","ENV_SPECIES"] },
+
+  { id:"REQ_WHG", theme:"Wasser", ref:"WHG (Wasserhaushaltsgesetz) + Landesrecht",
+    desc:"Gewässerquerungen, Bauwasserhaltung, Einleitungen, Schutzgebiete, wassergefährdende Stoffe.",
+    deliverables:"Wasserrechtlicher Antrag; Querungs-/Bauablaufkonzept; Nachweise Schutzmaßnahmen",
+    all:[], any:["PERM_WHG","ENV_WATER_CROSS","ENV_WATER_PROT"] },
+
+  { id:"REQ_KRWG", theme:"Abfall", ref:"KrWG (Kreislaufwirtschaftsgesetz)",
+    desc:"Abfallhierarchie, Entsorgungsnachweise, getrennte Erfassung, gefährliche Abfälle.",
+    deliverables:"Abfallkonzept; Entsorgungsnachweise; Register/Wiegescheine",
+    all:[], any:["MOD_DEMO","MOD_THERMO","MOD_COAL2GAS","MOD_UMSPANN","MOD_LINIE"] },
+
+  { id:"REQ_BIMSCHG", theme:"Immissionsschutz", ref:"BImSchG + 4. BImSchV (Genehmigungsbedürftige Anlagen)",
+    desc:"Genehmigung/Änderungsgenehmigung für Industrieanlagen (z.B. Kraftwerksbetrieb/Umbau).",
+    deliverables:"BImSchG-Antrag; Anlagendokumentation; Behördenauflagen-Tracking",
+    all:["PERM_BIMSCHG"], any:["MOD_THERMO","MOD_COAL2GAS"] },
+
+  { id:"REQ_TA_LUFT", theme:"Immissionsschutz Luft", ref:"TA Luft; 13. BImSchV / 44. BImSchV (je nach Anlagentyp/Leistung)",
+    desc:"Grenzwerte/Überwachung Emissionen (NOx, CO, Staub etc.), Mess-/Nachweispflichten.",
+    deliverables:"Emissionsprognose; Messkonzept; CEMS/Monitoring; Inbetriebnahmemessung",
+    all:[], any:["PROC_AIR","PERM_BIMSCHG"] },
+
+  { id:"REQ_TA_LAERM", theme:"Immissionsschutz Lärm", ref:"TA Lärm",
+    desc:"Lärmprognose, Einhaltung Immissionsrichtwerte (Tag/Nacht), Maßnahmen (Kapselung/Schallschutz).",
+    deliverables:"Schallgutachten; Messungen; Maßnahmen-/Abnahmeprotokolle",
+    all:[], any:["PROC_NOISE","ENV_URBAN","PERM_BIMSCHG"] },
+
+  { id:"REQ_STOERFALLV", theme:"Anlagensicherheit", ref:"12. BImSchV (Störfall-Verordnung)",
+    desc:"Pflichten bei überschrittenen Mengenschwellen (Sicherheitsbericht, Alarm- und Gefahrenabwehr).",
+    deliverables:"Störfallkonzept; ggf. Sicherheitsbericht; Notfallplanung; Übungen",
+    all:[], any:["PROC_STOERFALL"] },
+
+  { id:"REQ_TEHG_ETS", theme:"CO₂ / ETS", ref:"TEHG (EU ETS Deutschland)",
+    desc:"Zuteilung/Monitoring/Reporting/Verifikation von Treibhausgasemissionen.",
+    deliverables:"Monitoringplan; Emissionsbericht; Verifizierungsbericht; Audit-Trail",
+    all:[], any:["PROC_ETS","MOD_THERMO","MOD_COAL2GAS"] },
+
+  { id:"REQ_ARB_BAUSTELLV_DGUV", theme:"Arbeitsschutz", ref:"ArbSchG; BaustellV; DGUV Vorschriften/Regeln",
+    desc:"Gefährdungsbeurteilung, SiGe-Plan/Koordination, Unterweisungen, Prüfungen, Stop-Work.",
+    deliverables:"Gefährdungsbeurteilungen; SiGe-Plan; Unterweisungen; Auditberichte; PTW/LOTO",
+    all:[], any:["HSE_BAUSTELLV","HSE_HEIGHT","HSE_LIFTS"] },
+
+  { id:"REQ_GEFSTOFFV_TRGS", theme:"Gefahrstoffe", ref:"GefStoffV + TRGS (u.a. Asbest)",
+    desc:"Gefahrstoffverzeichnis, Exposition, Schutzmaßnahmen, Asbest-Sachkunde/Verfahren.",
+    deliverables:"Gefahrstoffkataster; Betriebsanweisungen; Messungen; Entsorgungsnachweise",
+    all:[], any:["PROC_GEFSTOFF","HSE_ASBEST","MOD_DEMO","ENV_SOIL_SUS"] },
+
+  { id:"REQ_BETRSICHV_TRBS", theme:"Betriebssicherheit", ref:"BetrSichV + TRBS",
+    desc:"Sichere Benutzung von Arbeitsmitteln, Prüfpflichten, Explosionsschutzdokument (bei ATEX).",
+    deliverables:"Prüf-/Inspektionspläne; Prüfprotokolle; Explosionsschutzdokument",
+    all:[], any:["PROC_ATEX","PROC_PED","MOD_THERMO","MOD_COAL2GAS","MOD_UMSPANN"] },
+
+  { id:"REQ_PED", theme:"Konformität / Druck", ref:"Druckgeräterichtlinie 2014/68/EU (PED) + EN 13480 (je nach Umfang)",
+    desc:"Einstufung, Auslegung, Fertigung, Prüfungen und technische Dokumentation für Druckgeräte/Druckleitungen.",
+    deliverables:"PED-Konformitätsnachweis; Werkstoff-/Schweißdokumente; NDT; Abnahmen",
+    all:[], any:["PROC_PED"] },
+
+  { id:"REQ_ATEX", theme:"Explosionsschutz", ref:"ATEX 2014/34/EU (Produkte) + 1999/92/EG (Betreiber)",
+    desc:"Zonenklassifikation, Gerätekategorien, Zündquellenbewertung, Inspektion/Qualifikation.",
+    deliverables:"Zonenplan; Ex-Equipment-Liste; Ex-Inspektionsberichte; Betreiber-Dokumentation",
+    all:[], any:["PROC_ATEX"] },
+
+  { id:"REQ_IEC61511", theme:"Functional Safety", ref:"IEC 61511 (SIS Lifecycle) / IEC 61508 (Grundnorm)",
+    desc:"HAZOP/LOPA, SIL-Zuweisung, Verifikation/Validierung, Management of Change.",
+    deliverables:"HAZOP/LOPA; SRS; SIL-Verifikation; Proof-Test-Konzept",
+    all:[], any:["PROC_SIS"] },
+
+  { id:"REQ_IEC62443", theme:"OT-Cybersecurity", ref:"IEC 62443 (OT Security) + ggf. BSI (KRITIS)",
+    desc:"Zonen-/Conduit-Modell, Hardening, Zugriffskontrolle, Patch-/Vuln.-Mgmt, Lieferkettensicherheit.",
+    deliverables:"Security-Konzept; Segmentierung; Hardening-Checklisten; Pentest/Review",
+    all:[], any:["GRID_CYBER","MOD_SCADA","GRID_KRITIS"] },
+
+  { id:"REQ_DIN_EN_50341", theme:"Technik Leitung", ref:"DIN EN 50341; DIN EN 60826",
+    desc:"Mechanische/elektrische Auslegung von Freileitungen, Lastannahmen (Wind/Eis), Sicherheitsabstände.",
+    deliverables:"Berechnungsberichte; Typstatik; Prüfvermerke; As-built",
+    all:[], any:["MOD_LINIE"] },
+
+  { id:"REQ_DIN_EN_61936", theme:"Technik Umspannwerk", ref:"DIN EN 61936-1 (VDE 0101-1); DIN EN 50522; IEC 62271",
+    desc:"Auslegung HV-Anlagen, Erdung, Schaltanlagenanforderungen, Sicherheit/Abstände.",
+    deliverables:"Erdungskonzept; Schutz/Leittechnik; FAT/SAT; Abnahmen",
+    all:[], any:["MOD_UMSPANN"] },
+
+  { id:"REQ_VDE_0105", theme:"Betrieb Stromanlagen", ref:"DIN VDE 0105-100",
+    desc:"Betrieb/Schalthandlungen, Arbeitsfreigaben, LOTO/Schaltberechtigungen.",
+    deliverables:"Schaltanweisungen; Freigaben; Trainingsnachweise",
+    all:[], any:["MOD_UMSPANN","MOD_LINIE"] },
+
+  { id:"REQ_DIN_EN_62305", theme:"Blitzschutz", ref:"DIN EN 62305",
+    desc:"Blitzschutz-/Überspannungsschutz-Konzept (Umspannwerk, Leitwarte, Kommunikationsanlagen).",
+    deliverables:"Blitzschutzkonzept; Prüfprotokolle",
+    all:[], any:["MOD_UMSPANN","MOD_SCADA","MOD_THERMO"] },
+];
+
+// ActionPlans mit (a) SLA als Gate-Fraction und (b) Anchors: müssen vor konkreten Tasks liegen
+const ACTION_PLANS = [
+  {
+    id:"AP_PERMIT_DELAY",
+    prevention:"Genehmigungs-/Behördenmatrix; Vorabstimmungen (Scoping); Vollständigkeitscheck (Checklisten); klare Verantwortlichkeiten (Permit Manager).",
+    monitoring:"Status-Tracker je Bescheid/Unterlage; offene Punkte (Aging); Behördenmeeting-Protokolle.",
+    contingency:"Re-Baselining; zusätzliche Ressourcen; Variantenprüfung; Phasierung/temporäre Maßnahmen.",
+    owner:"Permitting Lead / Projektleitung",
+    evidence:"Genehmigungsplan; Einreichpakete; Protokolle; Auflagenregister",
+    sla:{ prevention:0.20, monitoring:0.45, contingency:0.70, evidence:0.85 },
+    anchors:{
+      prevention:{ beforeTasks:["T2_APP"] },
+      monitoring:{ beforeTasks:["T2_PUBLIC"] },
+      contingency:{ beforeTasks:["T2_DECISION"] },
+      evidence:{ beforeTasks:["T2_DECISION"] }
+    }
+  },
+  {
+    id:"AP_UVPG_NATURA",
+    prevention:"Frühzeitige Kartierungen (1 Saisonzyklus); Trassen-/Layout-Optimierung; Vermeidungsmaßnahmen; Kompensationskonzept.",
+    monitoring:"Gutachter-Fortschritt; Behördenfeedback; Einwendungen; Monitoringplan-Entwurf.",
+    contingency:"Bauzeitfenster anpassen; alternative Bauverfahren; zusätzliche Ausgleichsflächen/Offsets.",
+    owner:"Umweltleiter/in",
+    evidence:"FFH-/Artenschutzberichte; Karten; Genehmigungsauflagen; Monitoringberichte",
+    sla:{ prevention:0.10, monitoring:0.35, contingency:0.55, evidence:0.75 },
+    anchors:{
+      prevention:{ beforeTasks:["T1_FIELD"] },
+      monitoring:{ beforeTasks:["T2_APP"] },
+      contingency:{ beforeTasks:["T2_PUBLIC"] },
+      evidence:{ beforeTasks:["T2_APP"] }
+    }
+  },
+  {
+    id:"AP_ROW_STAKE",
+    prevention:"Stakeholderplan; transparente Kommunikation; Land/ROW-Strategie; frühzeitige Verträge/Servituten.",
+    monitoring:"# Einwendungen; ROW-% gesichert; Eskalationsliste.",
+    contingency:"Trassenvariante; Ersatzstandorte; Mediation/Rechtsbeistand.",
+    owner:"Stakeholder-/Land Manager",
+    evidence:"ROW-Register; Kommunikationslog; Vereinbarungen",
+    sla:{ prevention:0.15, monitoring:0.40, contingency:0.65, evidence:0.80 },
+    anchors:{
+      prevention:{ beforeTasks:["T6_ROW"] },
+      monitoring:{ beforeTasks:["T6_ROW"] },
+      contingency:{ beforeTasks:["T6_MOB"] },
+      evidence:{ beforeTasks:["T6_ROW"] }
+    }
+  },
+  {
+    id:"AP_GRID_INTERFACE",
+    prevention:"Interface Register TSO/DSO; Schutz-/Telekom-Konzept früh; gemeinsame Testspezifikation; Gate Reviews.",
+    monitoring:"Abnahmetermine; offene TSO-Comments; Test-Completion (%).",
+    contingency:"Teil-Inbetriebnahme; temporäre Konfiguration; zusätzliche Testfenster.",
+    owner:"Grid-Interface Manager",
+    evidence:"TSO Requirements Traceability; SAT/FAT Protokolle; Abnahmebescheide",
+    sla:{ prevention:0.20, monitoring:0.45, contingency:0.65, evidence:0.80 },
+    anchors:{
+      prevention:{ beforeTasks:["T3_GRID_IF"] },
+      monitoring:{ beforeTasks:["T7_GRID_SAT"] },
+      contingency:{ beforeTasks:["T7_ENERGIZE"] },
+      evidence:{ beforeTasks:["T7_GRID_SAT"] }
+    }
+  },
+  {
+    id:"AP_LONG_LEAD",
+    prevention:"Long-Lead Liste; Dual Sourcing; Expediting; QA-Inspektionen; Vertragsmeilensteine (FAT, Versand).",
+    monitoring:"OTIF; Fertigungsfortschritt; Lieferantenrisiko-Score.",
+    contingency:"Alternativlieferant; Ersatztyp; Luftfracht/Expresslogistik; Re-Sequencing Bau.",
+    owner:"Procurement Lead",
+    evidence:"Expediting Reports; FAT Reports; Lieferpläne; NCRs",
+    sla:{ prevention:0.10, monitoring:0.35, contingency:0.55, evidence:0.70 },
+    anchors:{
+      prevention:{ beforeTasks:["T4_PO"] },
+      monitoring:{ beforeTasks:["T4_FAT"] },
+      contingency:{ beforeTasks:["T7_PRECOMM"] },
+      evidence:{ beforeTasks:["T7_PRECOMM"] }
+    }
+  },
+  {
+    id:"AP_HSE_SITE",
+    prevention:"SiGe-Koordination; Gefährdungsbeurteilungen; PTW/LOTO; Schulungen; Liftpläne; Tool-Box-Talks.",
+    monitoring:"Audits; Near-Miss; TRIR/LTIF; Stop-Work Aktionen.",
+    contingency:"Arbeiten stoppen; Incident Response; Ursachenanalyse (RCA); Nachschulung.",
+    owner:"HSE Manager / Bauleitung",
+    evidence:"SiGe-Plan; Permit-to-Work; Auditberichte; Unterweisungsnachweise",
+    sla:{ prevention:0.05, monitoring:0.25, contingency:0.40, evidence:0.60 },
+    anchors:{
+      prevention:{ beforeTasks:["T6_MOB"] },
+      monitoring:{ beforeTasks:["T6_FOUND"] },
+      contingency:{ beforeTasks:["T6_ERECT"] },
+      evidence:{ beforeTasks:["T6_MOB"] }
+    }
+  },
+  {
+    id:"AP_ATEX_PED_SIS",
+    prevention:"Zonenklassifikation/Ex-Dossier; PED-Klassifizierung & QA; HAZOP/LOPA; unabhängige Verifikationen; MOC.",
+    monitoring:"Offene HAZOP-Aktionen; Ex-Inspektionen; PED-Dossier-Status; SIL-Verification.",
+    contingency:"Redesign/Retrofit; Austausch Ex-Equipment; zusätzliche Tests; kontrollierter Shutdown.",
+    owner:"Process Safety / Mechanical / ICSS",
+    evidence:"Ex-Dossier; PED-Technical File; HAZOP/LOPA; SRS; Prüfberichte",
+    sla:{ prevention:0.25, monitoring:0.55, contingency:0.75, evidence:0.85 },
+    anchors:{
+      prevention:{ beforeTasks:["T7_PRECOMM"] },
+      monitoring:{ beforeTasks:["T7_PRECOMM"] },
+      contingency:{ beforeTasks:["T7_PRECOMM"] },
+      evidence:{ beforeTasks:["T7_PRECOMM"] }
+    }
+  },
+  {
+    id:"AP_CYBER_OT",
+    prevention:"Netzsegmentierung; MFA; Hardening; Patch-Prozess; Remote-Access Governance; Lieferkettensicherheit.",
+    monitoring:"Vulnerability Scans; Log-Monitoring; Audit der Zugänge; Patch-Compliance.",
+    contingency:"Isolierung; Incident Response Plan; Restore/Backup; Forensik.",
+    owner:"OT/IT Security Lead",
+    evidence:"Security-Konzept; Netzwerkdiagramme; Pentest; SOPs",
+    sla:{ prevention:0.20, monitoring:0.45, contingency:0.65, evidence:0.80 },
+    anchors:{
+      prevention:{ beforeTasks:["T7_PRECOMM"] },
+      monitoring:{ beforeTasks:["T7_GRID_SAT"] },
+      contingency:{ beforeTasks:["T7_ENERGIZE"] },
+      evidence:{ beforeTasks:["T7_GRID_SAT"] }
+    }
+  },
+  {
+    id:"AP_CONTAM_DEMO",
+    prevention:"Vorerkundung Schadstoffe/Altlasten; Probenahme; Abbruchkonzept; qualifizierte Entsorger; Sperrbereiche.",
+    monitoring:"Freimessungen; Entsorgungsnachweise; HSE-Audits.",
+    contingency:"Arbeiten stoppen; Sanierungskonzept; zusätzliche Entsorgungswege; Behördenmeldung.",
+    owner:"HSE + Bauleitung + Umwelt",
+    evidence:"Gutachten; TRGS-konforme Nachweise; Wiegescheine; Freimessprotokolle",
+    sla:{ prevention:0.10, monitoring:0.35, contingency:0.55, evidence:0.75 },
+    anchors:{
+      prevention:{ beforeTasks:["T6_C2G_DEMO"] },
+      monitoring:{ beforeTasks:["T6_C2G_DEMO"] },
+      contingency:{ beforeTasks:["T6_C2G_DEMO"] },
+      evidence:{ beforeTasks:["T6_C2G_DEMO"] }
+    }
+  },
+];
+
+const RISKS = [
+  { id:"R_PERM_01", cat:"Genehmigung", risk:"Verzögerung/Unvollständigkeit im Genehmigungsverfahren (Planfeststellung/BImSchG/UVP).",
+    cause:"Unvollständige Unterlagen; Scope-Änderungen; Behördenauflagen spät.",
+    all:[], any:["PERM_PLANFEST","PERM_BIMSCHG","PERM_UVPG"], req:["REQ_UVPG","REQ_BIMSCHG","REQ_ENWG_NABEG"], p:3, i:5, ap:"AP_PERMIT_DELAY", gate:"FEL/FEED" },
+
+  { id:"R_SOC_01", cat:"Stakeholder/Recht", risk:"Einwendungen/Klagen führen zu Stop/Verzögerung (Trasse, Lärm, Landschaft, Akzeptanz).",
+    cause:"Beteiligung/Kommunikation unzureichend; Varianten nicht nachvollziehbar.",
+    all:[], any:["ENV_URBAN","PERM_UVPG","PERM_PLANFEST"], req:["REQ_UVPG","REQ_TA_LAERM"], p:3, i:4, ap:"AP_ROW_STAKE", gate:"FEL/FEED" },
+
+  { id:"R_ROW_01", cat:"Land/ROW", risk:"ROW/Servituten/Grundstückszugänge nicht rechtzeitig gesichert.",
+    cause:"Eigentümerverhandlungen; Auflagen; Trassenänderungen.",
+    all:[], any:["MOD_LINIE"], req:["REQ_ENWG_NABEG"], p:4, i:4, ap:"AP_ROW_STAKE", gate:"FEED/Detail" },
+
+  { id:"R_ENV_01", cat:"Umwelt/Naturschutz", risk:"Natura2000/Artenschutz erzwingt Bauzeitfenster oder Trassen-/Layoutänderung.",
+    cause:"Saisonale Restriktionen; Kollisionen (Vögel); Habitatbetroffenheit.",
+    all:[], any:["ENV_NATURA","ENV_SPECIES"], req:["REQ_BNATSCHG_FFH","REQ_UVPG"], p:4, i:4, ap:"AP_UVPG_NATURA", gate:"FEL/FEED" },
+
+  { id:"R_WATER_01", cat:"Wasser", risk:"Gewässerquerung/Grundwasserauflagen verursachen Verzögerung oder Mehrkosten.",
+    cause:"Zusatzgutachten; alternative Bauverfahren; Hochwasserereignisse.",
+    all:[], any:["ENV_WATER_CROSS","ENV_WATER_PROT","PERM_WHG"], req:["REQ_WHG"], p:3, i:4, ap:"AP_UVPG_NATURA", gate:"FEED/Detail" },
+
+  { id:"R_SOIL_01", cat:"Boden/Altlasten", risk:"Altlasten/Schadstoffe im Boden oder Bestand führen zu Stop-Work und Spezialentsorgung.",
+    cause:"Unzureichende Vorerkundung; kontaminierter Standort (Kohlebestand).",
+    all:[], any:["ENV_SOIL_SUS","HSE_ASBEST","MOD_DEMO","MOD_COAL2GAS"], req:["REQ_GEFSTOFFV_TRGS","REQ_KRWG"], p:3, i:4, ap:"AP_CONTAM_DEMO", gate:"Const" },
+
+  { id:"R_TECH_01", cat:"Technik (Leitung)", risk:"Mechanische Auslegung (Wind/Eis) oder Abstände unzureichend → Nachrüstung/Neubauabschnitte.",
+    cause:"Lastannahmen falsch; lokale Klimadaten nicht berücksichtigt; Review fehlt.",
+    all:[], any:["MOD_LINIE"], req:["REQ_DIN_EN_50341"], p:2, i:5, ap:"AP_GRID_INTERFACE", gate:"Detail" },
+
+  { id:"R_TECH_02", cat:"Technik (Umspannwerk)", risk:"Erdungs-/Schutzkonzept fehlerhaft → Sicherheitsrisiko, Abnahmeverzug.",
+    cause:"Kurzschluss-/Erdfehlerdaten; Schnittstellen zu TSO/DSO; fehlende Koordination.",
+    all:[], any:["MOD_UMSPANN","GRID_TSO"], req:["REQ_DIN_EN_61936","REQ_VDE_0105"], p:3, i:5, ap:"AP_GRID_INTERFACE", gate:"Detail/Comm" },
+
+  { id:"R_SUP_01", cat:"Lieferkette", risk:"Long-Lead Equipment verspätet (Trafo, GIS, Turbine, HRSG, Ventile, Schutzgeräte).",
+    cause:"Kapazitätsengpässe; Lieferantenschnittstellen; QA/NCRs.",
+    all:[], any:["MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"], req:["REQ_DIN_EN_61936","REQ_PED"], p:4, i:4, ap:"AP_LONG_LEAD", gate:"Proc/Const" },
+
+  { id:"R_HSE_01", cat:"HSE", risk:"Unfallrisiko Arbeiten in der Höhe / Absturz / Rettungskette unzureichend.",
+    cause:"Unklare Verfahren; mangelnde Unterweisung; Wetterfenster.",
+    all:[], any:["HSE_HEIGHT","MOD_LINIE"], req:["REQ_ARB_BAUSTELLV_DGUV"], p:3, i:5, ap:"AP_HSE_SITE", gate:"Const" },
+
+  { id:"R_HSE_02", cat:"HSE", risk:"Schwerlastheben misslingt → Schaden/Verzug/Personengefährdung.",
+    cause:"Liftplan unzureichend; Bodenpressung; Wind; Kommunikation.",
+    all:[], any:["HSE_LIFTS","MOD_UMSPANN","MOD_THERMO"], req:["REQ_ARB_BAUSTELLV_DGUV"], p:2, i:5, ap:"AP_HSE_SITE", gate:"Const" },
+
+  { id:"R_HSE_03", cat:"HSE", risk:"UXO/Kampfmittel-Fund → Baustopp, Räumung, Neuplanung.",
+    cause:"Historische Belastung; fehlende Sondierung.",
+    all:[], any:["HSE_UXO"], req:["REQ_ARB_BAUSTELLV_DGUV"], p:2, i:5, ap:"AP_HSE_SITE", gate:"Const" },
+
+  { id:"R_PROC_01", cat:"Prozess/ATEX", risk:"ATEX-Zonenklassifikation oder Ex-Equipment-Auswahl falsch → Austausch/Abnahmeverzug.",
+    cause:"Fehlende/zu späte Zonenstudie; Lieferantenabweichungen.",
+    all:[], any:["PROC_ATEX","MOD_COAL2GAS","MOD_THERMO"], req:["REQ_ATEX","REQ_BETRSICHV_TRBS"], p:2, i:5, ap:"AP_ATEX_PED_SIS", gate:"Detail/Comm" },
+
+  { id:"R_PROC_02", cat:"Prozess/PED", risk:"PED-Konformität in Druckleitungen/Vessels nicht sauber gemanagt → Rework/Stillstand.",
+    cause:"Material/Schweiß-/NDT-Dokumentation; falsche Kategorie; Notified Body spät.",
+    all:[], any:["PROC_PED"], req:["REQ_PED","REQ_BETRSICHV_TRBS"], p:2, i:5, ap:"AP_ATEX_PED_SIS", gate:"Detail/Proc" },
+
+  { id:"R_PROC_03", cat:"Functional Safety", risk:"HAZOP/LOPA Aktionen nicht rechtzeitig geschlossen → Inbetriebnahme verzögert.",
+    cause:"Owner/Fristen fehlen; MOC unklar; Verifikation spät.",
+    all:[], any:["PROC_SIS"], req:["REQ_IEC61511"], p:3, i:4, ap:"AP_ATEX_PED_SIS", gate:"Detail/Comm" },
+
+  { id:"R_GAS_01", cat:"Gas-Interface", risk:"Gasanbindung: Druck/Qualität/Kapazität nicht rechtzeitig verfügbar → kein Inbetriebnahmefenster.",
+    cause:"Netzbetreiber-Schnittstelle; Genehmigungen; Bau/Material; Stationen.",
+    all:[], any:["MOD_GAS_CONN","MOD_COAL2GAS","MOD_THERMO"], req:["REQ_BIMSCHG","REQ_TA_LUFT"], p:3, i:5, ap:"AP_GRID_INTERFACE", gate:"FEED/Const" },
+
+  { id:"R_IMM_01", cat:"Immissionsschutz", risk:"TA Luft / 13./44. BImSchV Anforderungen (NOx/CO) werden im Betrieb nicht erreicht → Auflagen/Derating.",
+    cause:"Brennerauslegung; Regelung; Messkonzept; Betriebsweise (Start/Stop).",
+    all:[], any:["PROC_AIR","PERM_BIMSCHG","MOD_THERMO","MOD_COAL2GAS"], req:["REQ_TA_LUFT"], p:3, i:4, ap:"AP_PERMIT_DELAY", gate:"Comm/Operation" },
+
+  { id:"R_IMM_02", cat:"Immissionsschutz", risk:"TA Lärm Überschreitung (insb. nachts) → Nachrüstung Schallschutz/Restriktionen.",
+    cause:"Prognose unzureichend; geänderte Layouts; Fan/Kompressor-Geräusche.",
+    all:[], any:["PROC_NOISE","ENV_URBAN","PERM_BIMSCHG"], req:["REQ_TA_LAERM"], p:3, i:3, ap:"AP_PERMIT_DELAY", gate:"Detail/Comm" },
+
+  { id:"R_CYB_01", cat:"OT/Cyber", risk:"OT-/SCADA-Schwachstellen (Remote Access, Lieferkette) → Incident/Stillstand/Abnahmeverzug.",
+    cause:"Fehlende Segmentierung; unsichere Defaults; ungepatchte Systeme.",
+    all:[], any:["MOD_SCADA","GRID_CYBER","GRID_KRITIS"], req:["REQ_IEC62443"], p:3, i:5, ap:"AP_CYBER_OT", gate:"Detail/Comm" },
+
+  { id:"R_CON_01", cat:"Vertrag/Interfaces", risk:"Scope-Gaps zwischen Losen (EPC/Multiple Contracts) → Claims, Rework, Terminverzug.",
+    cause:"Unklare Schnittstellen; Change-Management schwach.",
+    all:[], any:["MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"], req:[], p:4, i:4, ap:"AP_GRID_INTERFACE", gate:"Detail/Const" },
+];
+
+const TASKS = [
+  { id:"T0_KICKOFF", name:"Projektstart/Kick-off + Rollen & Governance", module:"Transversal", dur:5, pred:[], deliver:"RACI, Kommunikationsplan", owner:"Projektleitung", gate:"FEL", all:[], any:["MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T0_REQ", name:"Anforderungs- & Compliance-Register erstellen (Traceability)", module:"Transversal", dur:10, pred:["T0_KICKOFF"], deliver:"Legal/Normen Register", owner:"Compliance/Engineering", gate:"FEL", all:[], any:["MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+
+  { id:"T1_SCOPING", name:"Genehmigungsstrategie/Behörden-Scoping", module:"Genehmigung", dur:15, pred:["T0_REQ"], deliver:"Genehmigungsfahrplan", owner:"Permitting Lead", gate:"FEL", all:[], any:["PERM_PLANFEST","PERM_BIMSCHG","PERM_UVPG"] },
+  { id:"T1_UVP_SCOP", name:"UVP Scoping (Untersuchungsrahmen)", module:"Genehmigung/Umwelt", dur:25, pred:["T1_SCOPING"], deliver:"Scoping-Unterlagen", owner:"Umweltleiter/in", gate:"FEL", all:["PERM_UVPG"], any:[] },
+  { id:"T1_FIELD", name:"Umwelt-/Feldkartierungen (mind. 1 Saisonzyklus)", module:"Genehmigung/Umwelt", dur:120, pred:["T1_UVP_SCOP"], deliver:"Kartierberichte", owner:"Umweltleiter/in", gate:"FEL/FEED", all:[], any:["ENV_NATURA","ENV_SPECIES","PERM_UVPG"] },
+  { id:"T1_FFH", name:"FFH-/Artenschutzprüfung + Maßnahmenkonzept", module:"Genehmigung/Umwelt", dur:60, pred:["T1_FIELD"], deliver:"FFH/Artenschutzgutachten", owner:"Umweltleiter/in", gate:"FEED", all:[], any:["ENV_NATURA","ENV_SPECIES"] },
+  { id:"T1_WATER", name:"Wasserrechtliche Unterlagen (Querung/Bauwasser/Schutzgebiete)", module:"Genehmigung/Umwelt", dur:45, pred:["T1_SCOPING"], deliver:"WHG-Antragspaket", owner:"Umwelt/Civil", gate:"FEED", all:[], any:["PERM_WHG","ENV_WATER_CROSS","ENV_WATER_PROT"] },
+
+  { id:"T2_APP", name:"Genehmigungsantrag erstellen & einreichen (Planfeststellung/BImSchG)", module:"Genehmigung", dur:60, pred:["T1_SCOPING","T1_FFH","T1_WATER"], deliver:"Einreichpaket", owner:"Permitting Lead", gate:"FEED", all:[], any:["PERM_PLANFEST","PERM_BIMSCHG"] },
+  { id:"T2_PUBLIC", name:"Öffentliche Auslegung & Einwendungsmanagement", module:"Genehmigung", dur:90, pred:["T2_APP"], deliver:"Einwendungsantworten", owner:"Permitting Lead", gate:"FEED", all:[], any:["PERM_UVPG","PERM_PLANFEST","PERM_BIMSCHG"] },
+  { id:"T2_DECISION", name:"Genehmigungsbescheid/Planfeststellungsbeschluss erhalten", module:"Genehmigung", dur:60, pred:["T2_PUBLIC"], deliver:"Bescheid + Auflagenregister", owner:"Permitting Lead", gate:"Detail", all:[], any:["PERM_PLANFEST","PERM_BIMSCHG"] },
+
+  { id:"T3_BASIC", name:"Basic Engineering (Layouts, SLD, Trassen-/Standortkonzept)", module:"Engineering", dur:45, pred:["T0_REQ"], deliver:"Basic Design Package", owner:"Engineering Manager", gate:"FEED", all:[], any:["MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T3_LT_DES", name:"Leitungsauslegung (Mechanik/Abstände) + unabhängiger Review", module:"Leitung", dur:60, pred:["T3_BASIC"], deliver:"Auslegungsberichte (DIN EN 50341/60826)", owner:"Leitungsengineering", gate:"Detail", all:[], any:["MOD_LINIE"] },
+  { id:"T3_SUB_DES", name:"Umspannwerk: Erdung/Schutz/Schaltanlage-Konzept", module:"Umspannwerk", dur:70, pred:["T3_BASIC"], deliver:"Erdung+Schutzkonzept (VDE/IEC)", owner:"Primär/Sekundär", gate:"Detail", all:[], any:["MOD_UMSPANN"] },
+  { id:"T3_GRID_IF", name:"TSO/DSO Interface Spezifikation + Abnahmeplan", module:"Grid Interface", dur:40, pred:["T3_BASIC"], deliver:"Interface Register + Testplan", owner:"Grid Interface", gate:"FEED/Detail", all:[], any:["GRID_TSO"] },
+
+  { id:"T3_HAZOP", name:"HAZOP/LOPA + SIL-Zuweisung", module:"Process Safety", dur:35, pred:["T3_BASIC"], deliver:"HAZOP/LOPA Report", owner:"Process Safety", gate:"FEED/Detail", all:[], any:["PROC_SIS","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T3_SRS", name:"SIS: Safety Requirements Specification (SRS) + Verifikation", module:"Process Safety", dur:30, pred:["T3_HAZOP"], deliver:"SRS + SIL Verification", owner:"ICSS/Process Safety", gate:"Detail", all:[], any:["PROC_SIS"] },
+  { id:"T3_ATEX", name:"ATEX: Zonenklassifikation + Ex-Dossier", module:"Process Safety", dur:30, pred:["T3_BASIC"], deliver:"Zonenplan + Ex-Equipment-Liste", owner:"HSE/Process", gate:"Detail", all:[], any:["PROC_ATEX"] },
+  { id:"T3_PED", name:"PED: Klassifizierung + QA/Notified Body Einbindung", module:"Mechanical", dur:30, pred:["T3_BASIC"], deliver:"PED Compliance Plan", owner:"Mechanical/QA", gate:"Detail", all:[], any:["PROC_PED"] },
+
+  { id:"T4_LONGLIST", name:"Long-Lead Liste + Beschaffungsstrategie", module:"Procurement", dur:20, pred:["T3_BASIC"], deliver:"Long-Lead Register", owner:"Procurement Lead", gate:"Detail", all:[], any:["MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T4_PO", name:"Bestellungen (Long-Lead) platzieren", module:"Procurement", dur:15, pred:["T4_LONGLIST"], deliver:"POs + Lieferpläne", owner:"Procurement Lead", gate:"Proc", all:[], any:["MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T4_FAT", name:"FAT (Trafo/GIS/Turbine/Schutz/SCADA) + QA", module:"Procurement/QA", dur:25, pred:["T4_PO"], deliver:"FAT Reports + NCR Closeout", owner:"QA/Engineering", gate:"Proc", all:[], any:["MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS","MOD_SCADA"] },
+
+  { id:"T5_SIGE", name:"SiGe-Plan/ Baustellenorganisation + PTW/LOTO", module:"HSE", dur:20, pred:["T0_KICKOFF"], deliver:"SiGe-Plan + PTW Verfahren", owner:"HSE Manager", gate:"Detail", all:[], any:["HSE_BAUSTELLV","MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T5_UXO", name:"Kampfmittelsondierung (falls Risiko)", module:"Bauvorbereitung", dur:30, pred:["T5_SIGE"], deliver:"UXO-Freigabeberichte", owner:"Bauleitung", gate:"Detail", all:[], any:["HSE_UXO"] },
+  { id:"T5_DEMO_SURV", name:"Schadstoff-/Altlastenerkundung Bestand (Asbest etc.)", module:"Bauvorbereitung", dur:25, pred:["T5_SIGE"], deliver:"Schadstoffkataster", owner:"HSE/Umwelt", gate:"Detail", all:[], any:["HSE_ASBEST","MOD_DEMO","MOD_COAL2GAS"] },
+
+  { id:"T6_MOB", name:"Mobilisierung Baustelle", module:"Construction", dur:10, pred:["T2_DECISION","T5_SIGE"], deliver:"Baustelleneinrichtung", owner:"Bauleitung", gate:"Const", all:[], any:["PERM_PLANFEST","PERM_BIMSCHG","MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T6_ROW", name:"ROW/Servituten finalisieren + Zugänge", module:"Construction", dur:60, pred:["T2_DECISION"], deliver:"ROW 100% gesichert", owner:"Land Manager", gate:"Const", all:[], any:["MOD_LINIE"] },
+  { id:"T6_FOUND", name:"Fundamente/Gründungen (Masten/Anlagen)", module:"Construction", dur:80, pred:["T6_MOB","T6_ROW","T5_UXO"], deliver:"Abnahme Fundamente", owner:"Bauleitung/Civil", gate:"Const", all:[], any:["MOD_LINIE","MOD_UMSPANN"] },
+  { id:"T6_ERECT", name:"Stahlbau/Mastmontage / Primärtechnik Montage", module:"Construction", dur:90, pred:["T6_FOUND"], deliver:"Mechanische Fertigstellung", owner:"Bauleitung", gate:"Const", all:[], any:["MOD_LINIE","MOD_UMSPANN"] },
+  { id:"T6_C2G_DEMO", name:"Rückbau/Abbruch Bestand (Coal-to-Gas)", module:"Construction", dur:70, pred:["T6_MOB","T5_DEMO_SURV"], deliver:"Freimessung/Entsorgung abgeschlossen", owner:"Bauleitung/HSE", gate:"Const", all:[], any:["MOD_COAL2GAS","MOD_DEMO"] },
+  { id:"T6_GAS_CONN", name:"Gasanbindung bauen/integrieren (Station/Anschluss)", module:"Construction", dur:90, pred:["T6_MOB"], deliver:"Gas-Interface bereit", owner:"Gas Interface", gate:"Const", all:[], any:["MOD_GAS_CONN"] },
+
+  { id:"T7_PRECOMM", name:"Pre-Commissioning (Checks, Loop Checks, Isolation, Dokumentation)", module:"Commissioning", dur:45, pred:["T6_ERECT","T4_FAT"], deliver:"Pre-Comm Dossier", owner:"Commissioning Manager", gate:"Comm", all:[], any:["MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS","MOD_SCADA","MOD_LINIE"] },
+  { id:"T7_GRID_SAT", name:"SAT + TSO/DSO Abnahmen (Schutz/Teleprotektion/SCADA)", module:"Commissioning", dur:30, pred:["T7_PRECOMM","T3_GRID_IF"], deliver:"TSO/DSO Abnahme", owner:"Grid Interface", gate:"Comm", all:[], any:["GRID_TSO"] },
+  { id:"T7_ENERGIZE", name:"Energisierung/Schalthandlungen nach VDE 0105-100", module:"Commissioning", dur:5, pred:["T7_GRID_SAT"], deliver:"Energize-Freigabe", owner:"Betrieb/Commissioning", gate:"Comm", all:[], any:["MOD_UMSPANN","MOD_LINIE"] },
+  { id:"T7_PERF", name:"Performance-/Emissions-/Lärm-Messungen (Inbetriebnahme)", module:"Commissioning", dur:20, pred:["T7_PRECOMM"], deliver:"Performance + Emissions-/Schallberichte", owner:"Process/Umwelt", gate:"Comm", all:[], any:["MOD_THERMO","MOD_COAL2GAS","PROC_AIR","PROC_NOISE"] },
+];
+
+/* ============================================================
+   2) UI: rendern
+   ============================================================ */
+function el(tag, attrs={}, ...children){
+  const e = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="class") e.className=v;
+    else if(k==="html") e.innerHTML=v;
+    else e.setAttribute(k,v);
+  }
+  for(const c of children){
+    if(c==null) continue;
+    if(typeof c==="string") e.appendChild(document.createTextNode(c));
+    else e.appendChild(c);
+  }
+  return e;
+}
+function renderCheckboxGroups(){
+  const containers = {
+    scope: document.getElementById("group_scope"),
+    permitting: document.getElementById("group_permitting"),
+    environment: document.getElementById("group_environment"),
+    process: document.getElementById("group_process"),
+    grid: document.getElementById("group_grid"),
+    hse: document.getElementById("group_hse")
+  };
+  Object.values(containers).forEach(c=>c.innerHTML="");
+  FEATURES.forEach(f=>{
+    const id = "chk_"+f.id;
+    const box = el("input",{type:"checkbox", id});
+    const label = el("div",{class:"t"}, f.label, el("div",{class:"small mono"}, f.id));
+    const wrap = el("label",{class:"check", for:id}, box, label);
+    containers[f.group].appendChild(wrap);
+  });
+}
+renderCheckboxGroups();
+
+/* ============================================================
+   3) Applicability Engine (ALL/ANY)
+   ============================================================ */
+function getSelectedFeatureSet(){
+  const sel = new Set();
+  FEATURES.forEach(f=>{
+    const chk = document.getElementById("chk_"+f.id);
+    if(chk && chk.checked) sel.add(f.id);
+  });
+  return sel;
+}
+function isApplicable(item, selected){
+  const all = item.all || [];
+  const any = item.any || [];
+  const okAll = all.length ? all.every(x=>selected.has(x)) : true;
+  const okAny = any.length ? any.some(x=>selected.has(x)) : true;
+  return okAll && okAny;
+}
+
+/* ============================================================
+   4) Risk scoring thresholds
+   ============================================================ */
+function riskLevel(score, preset="default"){
+  if(preset==="conservative"){
+    if(score>=16) return {lvl:"Kritisch", cls:"crit"};
+    if(score>=9)  return {lvl:"Hoch", cls:"high"};
+    if(score>=4)  return {lvl:"Mittel", cls:"med"};
+    return {lvl:"Niedrig", cls:"low"};
+  }
+  if(score>=17) return {lvl:"Kritisch", cls:"crit"};
+  if(score>=10) return {lvl:"Hoch", cls:"high"};
+  if(score>=5)  return {lvl:"Mittel", cls:"med"};
+  return {lvl:"Niedrig", cls:"low"};
+}
+function levelColor(level){
+  switch(level){
+    case "Kritisch": return [231,76,60];
+    case "Hoch":     return [230,126,34];
+    case "Mittel":   return [241,196,15];
+    default:         return [46,204,113];
+  }
+}
+
+/* ============================================================
+   5) CPM (Critical Path Method)
+   ============================================================ */
+function parsePred(pred){
+  if(!pred) return [];
+  if(Array.isArray(pred)) return pred;
+  return String(pred).split(";").map(s=>s.trim()).filter(Boolean);
+}
+function computeCPM(appTasks){
+  const map = new Map(appTasks.map(t=>[t.id, {...t, pred: parsePred(t.pred)}]));
+  for(const t of map.values()){
+    t.pred = t.pred.filter(p=>map.has(p));
+  }
+  const succ = new Map();
+  const indeg = new Map();
+  for(const id of map.keys()){ succ.set(id, []); indeg.set(id, 0); }
+  for(const t of map.values()){
+    for(const p of t.pred){
+      succ.get(p).push(t.id);
+      indeg.set(t.id, indeg.get(t.id)+1);
+    }
+  }
+  const q = [];
+  for(const [id,deg] of indeg.entries()) if(deg===0) q.push(id);
+  const topo = [];
+  while(q.length){
+    const id = q.shift();
+    topo.push(id);
+    for(const s of succ.get(id)){
+      indeg.set(s, indeg.get(s)-1);
+      if(indeg.get(s)===0) q.push(s);
+    }
+  }
+  if(topo.length !== map.size){
+    return { ok:false, error:"Zyklus in Vorgängerketten erkannt (CPM nicht berechenbar). Bitte Vorgänger prüfen.", tasks:[...map.values()] };
+  }
+  // Forward
+  for(const id of topo){
+    const t = map.get(id);
+    const es = t.pred.length ? Math.max(...t.pred.map(p=>map.get(p).EF)) : 0;
+    t.ES = es; t.EF = es + Number(t.dur||0);
+  }
+  const projectDuration = Math.max(...[...map.values()].map(t=>t.EF), 0);
+  // Backward init
+  for(const t of map.values()){
+    t.LF = projectDuration; t.LS = projectDuration - Number(t.dur||0);
+  }
+  const endIds = topo.filter(id => (succ.get(id)||[]).length===0);
+  for(const id of endIds){
+    const t = map.get(id);
+    t.LF = projectDuration;
+    t.LS = projectDuration - Number(t.dur||0);
+  }
+  // Backward pass
+  for(const id of topo.slice().reverse()){
+    const t = map.get(id);
+    const sids = succ.get(id) || [];
+    if(sids.length){
+      const lf = Math.min(...sids.map(sid => map.get(sid).LS));
+      t.LF = lf; t.LS = lf - Number(t.dur||0);
+    }
+    t.Float = t.LS - t.ES;
+    t.Critical = (t.Float === 0);
+  }
+  return { ok:true, tasks: topo.map(id=>map.get(id)), projectDuration };
+}
+function daysToDate(startDate, days){
+  const d = new Date(startDate);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+
+/* ============================================================
+   6) SLA Engine (Gate-calibrated + Anchored + Konflikte)
+   ============================================================ */
+function splitGates(g){ return String(g||"").split("/").map(s=>s.trim()).filter(Boolean); }
+function primaryGate(g){ const gs = splitGates(g); return gs[0] || "FEL"; }
+
+const LEVEL_OFFSET = { "Kritisch": -0.15, "Hoch": -0.10, "Mittel": 0.00, "Niedrig": +0.10 };
+
+function buildDefaultGateWindows(projectDuration){
+  const seg = { FEL:0.15, FEED:0.20, Detail:0.20, Proc:0.15, Const:0.25, Comm:0.05 };
+  let acc = 0; const win = {};
+  for(const g of ["FEL","FEED","Detail","Proc","Const","Comm"]){
+    const start = Math.round(acc * projectDuration);
+    const end = Math.round((acc + (seg[g]||0)) * projectDuration);
+    win[g] = {start, end: Math.max(end, start+1)};
+    acc += (seg[g]||0);
+  }
+  return win;
+}
+function computeGateWindowsFromCPM(cpm){
+  const win = {};
+  if(!cpm || !cpm.ok || !cpm.tasks?.length) return win;
+  for(const t of cpm.tasks){
+    for(const g of splitGates(t.gate)){
+      if(!win[g]) win[g] = {start: Number.POSITIVE_INFINITY, end: 0};
+      win[g].start = Math.min(win[g].start, t.ES ?? 0);
+      win[g].end   = Math.max(win[g].end,   t.EF ?? 0);
+    }
+  }
+  for(const [g,v] of Object.entries(win)){
+    if(!Number.isFinite(v.start)) delete win[g];
+    else if(v.end <= v.start) v.end = v.start + 1;
+  }
+  return win;
+}
+function getGateWindow(gate, gateWin, projectDuration){
+  if(gateWin && gateWin[gate]) return gateWin[gate];
+  const def = buildDefaultGateWindows(projectDuration || 1);
+  return def[gate] || {start:0, end: Math.max(1, projectDuration||1)};
+}
+function clamp(min, x, max){ return Math.max(min, Math.min(max, x)); }
+
+function computeDueDayForStep({gateStart, gateEnd, baseFraction, level}){
+  const offset = LEVEL_OFFSET[level] ?? 0.0;
+  const frac = clamp(0.05, baseFraction + offset, 0.95);
+  const gateLen = Math.max(1, gateEnd - gateStart);
+  const due = gateStart + Math.round(gateLen * frac);
+  return clamp(gateStart, due, gateEnd);
+}
+
+function indexCPMTasks(cpm){
+  const idx = new Map();
+  if(!cpm || !cpm.ok) return idx;
+  for(const t of (cpm.tasks||[])) idx.set(t.id, t);
+  return idx;
+}
+function earliestAnchorES(taskIds, taskIndex){
+  let best = null;
+  for(const id of (taskIds||[])){
+    const t = taskIndex.get(id);
+    if(!t) continue;
+    if(best===null || (t.ES < best.es)) best = {taskId:id, es:t.ES};
+  }
+  return best;
+}
+const STEP_BUFFER_FRAC = { prevention:0.07, monitoring:0.05, contingency:0.04, evidence:0.04 };
+
+function computeUpperBoundFromAnchors(stepKey, anchors, taskIndex, gateStart, gateEnd){
+  const beforeTasks = anchors?.[stepKey]?.beforeTasks || [];
+  const a = earliestAnchorES(beforeTasks, taskIndex);
+  if(!a) return { ub: gateEnd, anchor:null };
+
+  const gateLen = Math.max(1, gateEnd - gateStart);
+  const buffer = Math.max(1, Math.round(gateLen * (STEP_BUFFER_FRAC[stepKey] ?? 0.05)));
+  const ub = Math.max(gateStart, Math.min(gateEnd, a.es - buffer));
+  return { ub, anchor:{ taskId:a.taskId, es:a.es, buffer } };
+}
+
+function solveSLAWithBounds(prelim, upper, gateStart){
+  const keys = ["prevention","monitoring","contingency","evidence"];
+  const due = {...prelim};
+
+  // apply upper bounds
+  for(const k of keys) due[k] = Math.max(gateStart, Math.min(due[k], upper[k]));
+
+  // forward monotonic
+  for(let i=1;i<keys.length;i++){
+    const k = keys[i], prev = keys[i-1];
+    due[k] = Math.max(due[k], due[prev]);
+    due[k] = Math.min(due[k], upper[k]);
+  }
+  // backward adjust if needed
+  for(let i=keys.length-1;i>0;i--){
+    const k = keys[i], prev = keys[i-1];
+    if(due[prev] > due[k]) due[prev] = due[k];
+  }
+  // forward again
+  for(let i=1;i<keys.length;i++){
+    const k = keys[i], prev = keys[i-1];
+    due[k] = Math.max(due[k], due[prev]);
+    due[k] = Math.min(due[k], upper[k]);
+  }
+
+  const conflicts = [];
+  for(const k of keys){
+    if(due[k] > upper[k]) conflicts.push({step:k, type:"UB_VIOLATION"});
+  }
+  for(let i=1;i<keys.length;i++){
+    const k = keys[i], prev = keys[i-1];
+    if(due[k] < due[prev]) conflicts.push({step:k, type:"ORDER_CONFLICT"});
+  }
+  return { due, conflicts };
+}
+
+function computeSLADueDatesForRisk(risk, ap, cpm, projectStartDate){
+  const projectDuration = (cpm && cpm.ok) ? cpm.projectDuration : 180;
+  const gateWin = computeGateWindowsFromCPM(cpm);
+  const gate = primaryGate(risk.gate);
+  const gw = getGateWindow(gate, gateWin, projectDuration);
+
+  const sla = ap?.sla || {prevention:0.25, monitoring:0.55, contingency:0.75, evidence:0.85};
+
+  const prelim = {
+    prevention:  computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.prevention,  level:risk.level}),
+    monitoring:  computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.monitoring,  level:risk.level}),
+    contingency: computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.contingency, level:risk.level}),
+    evidence:    computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.evidence,    level:risk.level}),
+  };
+
+  const taskIndex = indexCPMTasks(cpm);
+  const anchors = ap?.anchors || {};
+
+  const upper = {};
+  const anchorsUsed = {};
+  for(const step of ["prevention","monitoring","contingency","evidence"]){
+    const {ub, anchor} = computeUpperBoundFromAnchors(step, anchors, taskIndex, gw.start, gw.end);
+    upper[step] = ub;
+    if(anchor) anchorsUsed[step] = anchor;
+  }
+
+  const solved = solveSLAWithBounds(prelim, upper, gw.start);
+  const dueDays = solved.due;
+
+  const toDateOrOffset = (d) => projectStartDate ? daysToDate(projectStartDate, d) : `Tag+${d}`;
+  const dueDates = {
+    prevention:  toDateOrOffset(dueDays.prevention),
+    monitoring:  toDateOrOffset(dueDays.monitoring),
+    contingency: toDateOrOffset(dueDays.contingency),
+    evidence:    toDateOrOffset(dueDays.evidence),
+  };
+
+  const hardConflicts = [];
+  for(const [step, a] of Object.entries(anchorsUsed)){
+    if(dueDays[step] >= a.es){
+      hardConflicts.push({ step, type:"ANCHOR_NOT_MET", taskId:a.taskId, taskES:a.es, dueDay:dueDays[step] });
+    }
+  }
+
+  return {
+    gate, window: gw,
+    prelimDays: prelim, upperDays: upper,
+    dueDays, dueDates,
+    anchorsUsed,
+    conflicts: [...(solved.conflicts||[]), ...hardConflicts]
+  };
+}
+
+/* ============================================================
+   7) Render output tables
+   ============================================================ */
+function renderRequirements(reqs){
+  const tbody = document.querySelector("#tblReq tbody");
+  tbody.innerHTML = "";
+  reqs.forEach(r=>{
+    tbody.appendChild(el("tr",{},
+      el("td",{}, el("span",{class:"mono"}, r.id)),
+      el("td",{}, r.theme),
+      el("td",{}, r.ref),
+      el("td",{}, r.desc),
+      el("td",{}, r.deliverables),
+      el("td",{}, el("span",{class:"mono"}, [...(r.all||[]), ...(r.any||[])].join(", ")))
+    ));
+  });
+  if(reqs.length===0){
+    tbody.appendChild(el("tr",{}, el("td",{colspan:"6", class:"muted"}, "Keine Anforderungen aktiv (bitte Merkmale auswählen).")));
+  }
+}
+
+function findActionPlan(id){ return ACTION_PLANS.find(x=>x.id===id); }
+
+function renderRisks(risks, thresholdPreset){
+  const tbody = document.querySelector("#tblRisk tbody");
+  tbody.innerHTML = "";
+  risks.forEach(r=>{
+    const ap = findActionPlan(r.ap) || {prevention:"—", monitoring:"—", contingency:"—", owner:"—", evidence:"—"};
+    const reqChips = (r.req||[]).map(x=>`<span class="chip mono">${x}</span>`).join(" ");
+    const pId = `p_${r.id}`, iId=`i_${r.id}`;
+    const score = r.p * r.i;
+    const lvl = riskLevel(score, thresholdPreset);
+
+    tbody.appendChild(el("tr",{},
+      el("td",{}, el("span",{class:"mono"}, r.id)),
+      el("td",{}, r.cat),
+      el("td",{}, r.risk),
+      el("td",{}, r.cause),
+      el("td",{html:reqChips || "—"}),
+      el("td",{}, el("input",{type:"number", min:"1", max:"5", step:"1", value:String(r.p), id:pId, "data-risk":r.id, "data-kind":"p"})),
+      el("td",{}, el("input",{type:"number", min:"1", max:"5", step:"1", value:String(r.i), id:iId, "data-risk":r.id, "data-kind":"i"})),
+      el("td",{id:`score_${r.id}`}, String(score)),
+      el("td",{id:`lvl_${r.id}`}, el("span",{class:`lvl ${lvl.cls}`}, lvl.lvl)),
+      el("td",{}, ap.prevention),
+      el("td",{}, ap.monitoring),
+      el("td",{}, ap.contingency),
+      el("td",{}, ap.owner),
+      el("td",{}, r.gate || "—"),
+    ));
+  });
+
+  if(risks.length===0){
+    tbody.appendChild(el("tr",{}, el("td",{colspan:"14", class:"muted"}, "Keine Risiken aktiv (bitte Merkmale auswählen).")));
+  }
+
+  tbody.querySelectorAll('input[type="number"]').forEach(inp=>{
+    inp.addEventListener("input", ()=>{
+      const rid = inp.getAttribute("data-risk");
+      const p = Math.max(1, Math.min(5, Number(document.getElementById(`p_${rid}`).value || 1)));
+      const i = Math.max(1, Math.min(5, Number(document.getElementById(`i_${rid}`).value || 1)));
+      const sc = p*i;
+      document.getElementById(`score_${rid}`).textContent = String(sc);
+      const lv = riskLevel(sc, document.getElementById("thresholdPreset").value);
+      const cell = document.getElementById(`lvl_${rid}`);
+      cell.innerHTML = "";
+      cell.appendChild(el("span",{class:`lvl ${lv.cls}`}, lv.lvl));
+    });
+  });
+}
+
+function cloneTasksWithOverrides(appTasks){
+  const overrides = new Map();
+  document.querySelectorAll('#tblSched input[type="number"][id^="dur_"]').forEach(inp=>{
+    const id = inp.getAttribute("data-task");
+    const v = Number(inp.value);
+    if(id && !Number.isNaN(v)) overrides.set(id, v);
+  });
+  return appTasks.map(t => ({...t, dur: overrides.has(t.id) ? overrides.get(t.id) : t.dur}));
+}
+
+function renderSchedule(appTasks, startDate){
+  const tbody = document.querySelector("#tblSched tbody");
+  tbody.innerHTML = "";
+
+  const cpm = computeCPM(appTasks);
+  const note = document.getElementById("schedNote");
+  if(!cpm.ok){
+    note.innerHTML = `<span style="color:#ffb4ad;font-weight:700">CPM-Fehler:</span> ${cpm.error}`;
+    tbody.appendChild(el("tr",{}, el("td",{colspan:"14", class:"muted"}, "Terminplan konnte nicht berechnet werden.")));
+    return {cpm:null};
+  }
+
+  const projDur = cpm.projectDuration;
+  const endDate = startDate ? daysToDate(startDate, projDur) : "—";
+  note.innerHTML = `Projekt-/Netto-Dauer (Tage): <span class="mono">${projDur}</span> | Start: <span class="mono">${startDate||"—"}</span> | Ende (ES/EF): <span class="mono">${endDate}</span>`;
+
+  for(const t of cpm.tasks){
+    const isCrit = t.Critical;
+    const tr = el("tr", {class: isCrit ? "critical-row" : ""});
+    const durInput = el("input",{type:"number", min:"0", step:"1", value:String(t.dur), id:`dur_${t.id}`, "data-task":t.id});
+
+    const ESd = startDate ? daysToDate(startDate, t.ES) : String(t.ES);
+    const EFd = startDate ? daysToDate(startDate, t.EF) : String(t.EF);
+    const LSd = startDate ? daysToDate(startDate, t.LS) : String(t.LS);
+    const LFd = startDate ? daysToDate(startDate, t.LF) : String(t.LF);
+
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, t.id)));
+    tr.appendChild(el("td",{}, t.name));
+    tr.appendChild(el("td",{}, t.module));
+    tr.appendChild(el("td",{}, durInput));
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, (t.pred||[]).join(";") || "—")));
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, ESd)));
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, EFd)));
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, LSd)));
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, LFd)));
+    tr.appendChild(el("td",{}, el("span",{class:"mono"}, String(t.Float))));
+    tr.appendChild(el("td",{}, isCrit ? el("span",{class:"lvl crit"}, "JA") : el("span",{class:"lvl low"}, "NEIN")));
+    tr.appendChild(el("td",{}, t.deliver || "—"));
+    tr.appendChild(el("td",{}, t.owner || "—"));
+    tr.appendChild(el("td",{}, t.gate || "—"));
+
+    tbody.appendChild(tr);
+  }
+  if(cpm.tasks.length===0){
+    tbody.appendChild(el("tr",{}, el("td",{colspan:"14", class:"muted"}, "Keine Aufgaben aktiv (bitte Merkmale auswählen).")));
+  }
+  return {cpm};
+}
+
+/* ============================================================
+   8) Generate pipeline (inkl. Speicherung für Exports)
+   ============================================================ */
+function generate(){
+  const selected = getSelectedFeatureSet();
+  const active = [...selected].sort();
+  document.getElementById("activeFeatures").innerHTML = active.length
+    ? active.map(x=>`<span class="chip mono">${x}</span>`).join(" ")
+    : "—";
+
+  const reqs = REQUIREMENTS.filter(r=>isApplicable(r, selected));
+
+  const risks = RISKS.filter(r=>isApplicable(r, selected)).map(r=>({...r}));
+
+  const tasksRaw = TASKS.filter(t=>isApplicable(t, selected)).map(t=>({...t}));
+  const tasks = cloneTasksWithOverrides(tasksRaw);
+
+  renderRequirements(reqs);
+  const preset = document.getElementById("thresholdPreset").value;
+  renderRisks(risks, preset);
+
+  const startDate = document.getElementById("projectStart").value;
+  const sched = renderSchedule(tasks, startDate);
+
+  const countsEl = document.getElementById("counts");
+  countsEl.innerHTML = `
+    <div>Aktive Anforderungen: <span class="mono">${reqs.length}</span></div>
+    <div>Aktive Risiken: <span class="mono">${risks.length}</span></div>
+    <div>Aktive Aufgaben (WBS): <span class="mono">${tasks.length}</span></div>
+  `;
+
+  window.__GEN__ = {
+    selected:[...selected],
+    requirements:reqs,
+    risks:risks,
+    tasks:tasks,
+    cpm: sched.cpm,
+    project:{
+      name: document.getElementById("projectName").value || "",
+      start: document.getElementById("projectStart").value || "",
+      thresholdPreset: preset
+    }
+  };
+}
+document.getElementById("btnGenerate").addEventListener("click", generate);
+
+/* ============================================================
+   9) Save/Load config (localStorage)
+   ============================================================ */
+function saveConfig(){
+  const selected = [...getSelectedFeatureSet()];
+  const cfg = {
+    projectName: document.getElementById("projectName").value || "",
+    projectStart: document.getElementById("projectStart").value || "",
+    thresholdPreset: document.getElementById("thresholdPreset").value || "default",
+    selected
+  };
+  localStorage.setItem("riskMatrixConfigDE", JSON.stringify(cfg));
+  alert("Gespeichert: riskMatrixConfigDE");
+}
+function loadConfig(){
+  const raw = localStorage.getItem("riskMatrixConfigDE");
+  if(!raw){ alert("Keine gespeicherte Konfiguration gefunden."); return; }
+  const cfg = JSON.parse(raw);
+  document.getElementById("projectName").value = cfg.projectName || "";
+  document.getElementById("projectStart").value = cfg.projectStart || "";
+  document.getElementById("thresholdPreset").value = cfg.thresholdPreset || "default";
+  const set = new Set(cfg.selected || []);
+  FEATURES.forEach(f=>{
+    const chk = document.getElementById("chk_"+f.id);
+    if(chk) chk.checked = set.has(f.id);
+  });
+  generate();
+}
+function resetConfig(){
+  document.getElementById("projectName").value = "";
+  document.getElementById("projectStart").value = "";
+  document.getElementById("thresholdPreset").value = "default";
+  FEATURES.forEach(f=>{
+    const chk = document.getElementById("chk_"+f.id);
+    if(chk) chk.checked = false;
+  });
+  generate();
+}
+document.getElementById("btnSave").addEventListener("click", saveConfig);
+document.getElementById("btnLoad").addEventListener("click", loadConfig);
+document.getElementById("btnReset").addEventListener("click", resetConfig);
+
+/* ============================================================
+   10) Export helpers (CSV/JSON)
+   ============================================================ */
+function download(filename, text){
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function toCSV(rows, headers){
+  const esc = (v) => {
+    const s = (v==null) ? "" : String(v);
+    if(/[",\n]/.test(s)) return `"${s.replaceAll('"','""')}"`;
+    return s;
+  };
+  const head = headers.map(esc).join(",");
+  const lines = rows.map(r => headers.map(h=>esc(r[h])).join(","));
+  return [head, ...lines].join("\n");
+}
+
+function exportReq(){
+  const gen = window.__GEN__ || {};
+  const rows = (gen.requirements||[]).map(r=>({
+    ID:r.id, Thema:r.theme, Referenz:r.ref, Pflicht_Zweck:r.desc, Evidenzen:r.deliverables,
+    Trigger_ALL:(r.all||[]).join(";"), Trigger_ANY:(r.any||[]).join(";")
+  }));
+  download("Anforderungen.csv", toCSV(rows, ["ID","Thema","Referenz","Pflicht_Zweck","Evidenzen","Trigger_ALL","Trigger_ANY"]));
+}
+
+function exportRisk(){
+  const gen = window.__GEN__ || {};
+  const preset = document.getElementById("thresholdPreset").value;
+  const rows = (gen.risks||[]).map(r=>{
+    const pEl = document.getElementById(`p_${r.id}`);
+    const iEl = document.getElementById(`i_${r.id}`);
+    const p = pEl ? Number(pEl.value) : r.p;
+    const i = iEl ? Number(iEl.value) : r.i;
+    const score = p*i;
+    const lv = riskLevel(score, preset).lvl;
+    const ap = findActionPlan(r.ap) || {};
+    return {
+      ID:r.id, Kategorie:r.cat, Risiko:r.risk, Ursache:r.cause,
+      Anforderungen:(r.req||[]).join(";"),
+      P:p, I:i, Score:score, Stufe:lv,
+      Praevention:ap.prevention||"", Monitoring:ap.monitoring||"", Kontingenz:ap.contingency||"",
+      Owner:ap.owner||"", Gate:r.gate||""
+    };
+  });
+  download("Risiken.csv", toCSV(rows, ["ID","Kategorie","Risiko","Ursache","Anforderungen","P","I","Score","Stufe","Praevention","Monitoring","Kontingenz","Owner","Gate"]));
+}
+
+function exportSched(){
+  const gen = window.__GEN__ || {};
+  const start = document.getElementById("projectStart").value;
+  const tasksRaw = (gen.tasks||[]).map(t=>{
+    const dEl = document.getElementById(`dur_${t.id}`);
+    const dur = dEl ? Number(dEl.value) : Number(t.dur||0);
+    return {...t, dur};
+  });
+  const cpm = computeCPM(tasksRaw);
+  const rows = (cpm.ok ? cpm.tasks : tasksRaw).map(t=>({
+    ID:t.id, Taetigkeit:t.name, Modul:t.module, Dauer_Tage:t.dur,
+    Vorgaenger:(t.pred||[]).join(";"),
+    ES: start ? daysToDate(start, t.ES||0) : (t.ES||0),
+    EF: start ? daysToDate(start, t.EF||0) : (t.EF||0),
+    LS: start ? daysToDate(start, t.LS||0) : (t.LS||0),
+    LF: start ? daysToDate(start, t.LF||0) : (t.LF||0),
+    Float:(t.Float!=null ? t.Float : ""),
+    Kritisch:(t.Critical ? "JA":"NEIN"),
+    Deliverable:t.deliver||"",
+    Owner:t.owner||"",
+    Gate:t.gate||""
+  }));
+  download("Terminplan_CPM.csv", toCSV(rows, ["ID","Taetigkeit","Modul","Dauer_Tage","Vorgaenger","ES","EF","LS","LF","Float","Kritisch","Deliverable","Owner","Gate"]));
+}
+
+function exportJSON(){
+  const gen = window.__GEN__ || {};
+  const preset = document.getElementById("thresholdPreset").value;
+  const start = document.getElementById("projectStart").value || "";
+
+  const tasks = (gen.tasks||[]).map(t=>{
+    const dEl = document.getElementById(`dur_${t.id}`);
+    const dur = dEl ? Number(dEl.value) : Number(t.dur||0);
+    return {...t, dur};
+  });
+  const cpm = computeCPM(tasks);
+
+  const risks = (gen.risks||[]).map(r=>{
+    const pEl = document.getElementById(`p_${r.id}`);
+    const iEl = document.getElementById(`i_${r.id}`);
+    const p = pEl ? Math.max(1, Math.min(5, Number(pEl.value||1))) : r.p;
+    const i = iEl ? Math.max(1, Math.min(5, Number(iEl.value||1))) : r.i;
+    const score = p*i;
+    const level = riskLevel(score, preset).lvl;
+    const ap = findActionPlan(r.ap) || {};
+    const riskObj = {...r, p, i, score, level, action: ap};
+    riskObj.sla = computeSLADueDatesForRisk(riskObj, ap, cpm, start);
+    return riskObj;
+  });
+
+  const out = {
+    ...gen,
+    tasks,
+    cpm,
+    risks,
+    exportedAt: new Date().toISOString()
+  };
+  download("Risikomatrix_Export.json", JSON.stringify(out, null, 2));
+}
+
+document.getElementById("btnExportReq").addEventListener("click", exportReq);
+document.getElementById("btnExportRisk").addEventListener("click", exportRisk);
+document.getElementById("btnExportSched").addEventListener("click", exportSched);
+document.getElementById("btnExportJSON").addEventListener("click", exportJSON);
+
+/* ============================================================
+   11) PDF Report (inkl. SLA-Tracker + Anker + Konflikte)
+   ============================================================ */
+function collectStateForReport(){
+  const gen = window.__GEN__ || {selected:[], requirements:[], risks:[], tasks:[], project:{}, cpm:null};
+  const preset = document.getElementById("thresholdPreset").value;
+  const start = document.getElementById("projectStart").value || "";
+
+  // tasks + CPM (mit override durations)
+  const tasks = (gen.tasks || []).map(t => {
+    const dEl = document.getElementById(`dur_${t.id}`);
+    const dur = dEl ? Number(dEl.value) : Number(t.dur||0);
+    return {...t, dur};
+  });
+  const cpm = computeCPM(tasks);
+
+  const requirements = (gen.requirements || []).map(r => ({
+    id:r.id, theme:r.theme, ref:r.ref, desc:r.desc, deliverables:r.deliverables,
+    all:(r.all||[]), any:(r.any||[])
+  }));
+
+  const risks = (gen.risks || []).map(r => {
+    const pEl = document.getElementById(`p_${r.id}`);
+    const iEl = document.getElementById(`i_${r.id}`);
+    const p = pEl ? Math.max(1, Math.min(5, Number(pEl.value||1))) : r.p;
+    const i = iEl ? Math.max(1, Math.min(5, Number(iEl.value||1))) : r.i;
+    const score = p*i;
+    const level = riskLevel(score, preset).lvl;
+    const ap = findActionPlan(r.ap) || {prevention:"—", monitoring:"—", contingency:"—", owner:"—", evidence:"—", sla:null, anchors:null};
+
+    const riskObj = { id:r.id, cat:r.cat, risk:r.risk, cause:r.cause, req:(r.req||[]),
+                      p,i,score, level, gate:r.gate||"—", action: ap };
+    riskObj.sla = computeSLADueDatesForRisk(riskObj, ap, cpm, start);
+    return riskObj;
+  }).sort((a,b)=> b.score - a.score);
+
+  return {
+    project: {
+      name: (document.getElementById("projectName").value || gen.project?.name || "").trim(),
+      startDate: start,
+      thresholdPreset: preset,
+      generatedAt: new Date().toISOString()
+    },
+    selected: gen.selected || [],
+    requirements,
+    risks,
+    tasks,
+    cpm
+  };
+}
+
+function exportPDFReport(){
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    alert("jsPDF nicht geladen. Bitte Internetzugang prüfen oder Bibliotheken lokal einbinden.");
+    return;
+  }
+  const state = collectStateForReport();
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF({orientation:"p", unit:"pt", format:"a4"});
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 40;
+
+  const addHeader = (title) => {
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(14);
+    doc.setTextColor(20,30,60);
+    doc.text(title, margin, 46);
+
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
+    doc.setTextColor(120,130,150);
+    const meta = [
+      `Projekt: ${state.project.name || "—"}`,
+      `Start: ${state.project.startDate || "—"}`,
+      `Preset: ${state.project.thresholdPreset}`,
+      `Report: ${new Date().toLocaleString("de-DE")}`
+    ].join(" | ");
+    doc.text(meta, margin, 62);
+
+    doc.setDrawColor(200,205,220);
+    doc.line(margin, 72, pageW - margin, 72);
+  };
+
+  addHeader("Risikomanagement – Abschlussbericht");
+  let y = 90;
+
+  // 1) Features
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("1) Aktivierte Merkmale (Checkbox-Trigger)", margin, y); y += 14;
+
+  doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(40,50,80);
+  const featText = state.selected.length ? state.selected.join(", ") : "—";
+  const featLines = doc.splitTextToSize(featText, pageW - 2*margin);
+  doc.text(featLines, margin, y);
+  y += featLines.length * 11 + 10;
+
+  // 2) Requirements
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("2) Anwendbare Anforderungen (Legal/Normen Register)", margin, y); y += 8;
+
+  const reqRows = state.requirements.map(r => ([r.id, r.theme, r.ref, r.deliverables]));
+  doc.autoTable({
+    startY: y + 6,
+    head: [["ID","Thema","Referenz (DE/EU/Norm)","Evidenzen/Deliverables"]],
+    body: reqRows.length ? reqRows : [["—","—","—","Keine Anforderungen aktiv"]],
+    styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak" },
+    headStyles: { fillColor: [15, 25, 55] },
+    columnStyles: { 0:{cellWidth:70}, 1:{cellWidth:90}, 2:{cellWidth:180}, 3:{cellWidth:"auto"} },
+    margin: {left: margin, right: margin}
+  });
+
+  // 3) Risk overview
+  y = (doc.lastAutoTable?.finalY || 90) + 18;
+  if(y > pageH - margin - 40){ doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90; }
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("3) Risikoübersicht (Priorisiert nach Score)", margin, y); y += 8;
+
+  const riskRows = state.risks.map(r => ([r.id, r.cat, r.level, String(r.p), String(r.i), String(r.score), (r.action?.owner||"—"), (r.gate||"—")]));
+  doc.autoTable({
+    startY: y + 6,
+    head: [["ID","Kategorie","Stufe","P","I","Score","Owner (Rolle)","Gate"]],
+    body: riskRows.length ? riskRows : [["—","—","—","—","—","—","—","—"]],
+    styles: { fontSize: 8, cellPadding: 4 },
+    headStyles: { fillColor: [15, 25, 55] },
+    margin: {left: margin, right: margin},
+    didParseCell: (data)=>{
+      if(data.section === "body" && data.column.index === 2){
+        const lvl = data.cell.text?.[0] || "";
+        const c = levelColor(lvl);
+        data.cell.styles.textColor = c;
+        data.cell.styles.fontStyle = "bold";
+      }
+    }
+  });
+
+  // 4) Maßnahmen-Tracker (SLA)
+  doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("4) Maßnahmen-Tracker (SLA) – priorisiert nach Fälligkeit", margin, y); y += 10;
+
+  const tracker = [];
+  for(const r of state.risks){
+    const owner = r.action?.owner || "—";
+    const gate = r.sla?.gate || primaryGate(r.gate);
+    const dd = r.sla?.dueDates || {};
+    tracker.push([r.id, r.level, gate, "Prävention",  owner, dd.prevention  || "—"]);
+    tracker.push([r.id, r.level, gate, "Monitoring",  owner, dd.monitoring  || "—"]);
+    tracker.push([r.id, r.level, gate, "Kontingenz",  owner, dd.contingency || "—"]);
+    tracker.push([r.id, r.level, gate, "Evidenzen",   owner, dd.evidence    || "—"]);
+  }
+  const sevRank = {Kritisch:1, Hoch:2, Mittel:3, Niedrig:4};
+  tracker.sort((a,b)=>{
+    const da = a[5], db = b[5];
+    if(da < db) return -1;
+    if(da > db) return 1;
+    return (sevRank[a[1]]||9) - (sevRank[b[1]]||9);
+  });
+
+  doc.autoTable({
+    startY: y,
+    head: [["Risk ID","Stufe","Gate","Aktion","Owner","Fällig bis"]],
+    body: tracker.length ? tracker : [["—","—","—","—","—","—"]],
+    styles: { fontSize: 8, cellPadding: 4, overflow:"linebreak" },
+    headStyles: { fillColor: [15, 25, 55] },
+    margin: {left: margin, right: margin},
+    didParseCell: (data)=>{
+      if(data.section==="body" && data.column.index===1){
+        const lvl = data.cell.text?.[0] || "";
+        const col = levelColor(lvl);
+        data.cell.styles.textColor = col;
+        data.cell.styles.fontStyle = "bold";
+      }
+    }
+  });
+
+  // 5) Detailanalyse je Risiko
+  doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("5) Detailanalyse je Risiko inkl. Maßnahmen (SLA + Anker-Logik)", margin, y); y += 10;
+
+  state.risks.forEach((r) => {
+    if(y > pageH - margin - 160){
+      doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+    }
+    const c = levelColor(r.level);
+    doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(c[0],c[1],c[2]);
+    doc.text(`${r.id}  |  ${r.level}  |  Score ${r.score} (P=${r.p}, I=${r.i})`, margin, y); y += 12;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(15,25,55);
+    doc.text("Risiko:", margin, y);
+    doc.setFont("helvetica","normal"); doc.setTextColor(40,50,80);
+    const riskLines = doc.splitTextToSize(r.risk, pageW - 2*margin - 45);
+    doc.text(riskLines, margin + 45, y);
+    y += Math.max(12, riskLines.length*11);
+
+    doc.setFont("helvetica","bold"); doc.setTextColor(15,25,55);
+    doc.text("Ursache/Trigger:", margin, y);
+    doc.setFont("helvetica","normal"); doc.setTextColor(40,50,80);
+    const causeLines = doc.splitTextToSize(r.cause || "—", pageW - 2*margin - 90);
+    doc.text(causeLines, margin + 90, y);
+    y += Math.max(12, causeLines.length*11);
+
+    doc.setFont("helvetica","bold"); doc.setTextColor(15,25,55);
+    doc.text("Bezug (Anforderungen):", margin, y);
+    doc.setFont("helvetica","normal"); doc.setTextColor(40,50,80);
+    const reqText = (r.req && r.req.length) ? r.req.join(", ") : "—";
+    const reqLines = doc.splitTextToSize(reqText, pageW - 2*margin - 120);
+    doc.text(reqLines, margin + 120, y);
+    y += Math.max(12, reqLines.length*11);
+
+    doc.setFont("helvetica","bold"); doc.setTextColor(15,25,55);
+    doc.text("Owner/Gate:", margin, y);
+    doc.setFont("helvetica","normal"); doc.setTextColor(40,50,80);
+    doc.text(`${r.action?.owner || "—"} | ${r.gate || "—"}`, margin + 70, y);
+    y += 14;
+
+    const actionBlocks = [
+      {key:"prevention",  title:"Prävention (Mitigation):", text: r.action?.prevention || "—"},
+      {key:"monitoring",  title:"Monitoring/Detection:",    text: r.action?.monitoring || "—"},
+      {key:"contingency", title:"Kontingenz (Fallback):",   text: r.action?.contingency || "—"},
+      {key:"evidence",    title:"Evidenzen/Nachweise:",     text: r.action?.evidence || "—"},
+    ];
+
+    actionBlocks.forEach(b => {
+      if(y > pageH - margin - 95){
+        doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+      }
+      const due = r.sla?.dueDates?.[b.key] || "—";
+      const gate = r.sla?.gate || primaryGate(r.gate);
+      const anchor = r.sla?.anchorsUsed?.[b.key];
+      const anchorTxt = anchor ? ` | Anker: ${anchor.taskId} (ES=${anchor.es}, Buffer=${anchor.buffer}d)` : "";
+
+      doc.setFont("helvetica","bold"); doc.setTextColor(15,25,55);
+      doc.text(`${b.title} (Fällig bis: ${due} | Gate: ${gate}${anchorTxt})`, margin, y);
+
+      doc.setFont("helvetica","normal"); doc.setTextColor(40,50,80);
+      const lines = doc.splitTextToSize(b.text, pageW - 2*margin);
+      doc.text(lines, margin, y+12);
+      y += 12 + lines.length*11 + 6;
+    });
+
+    // Konflikte je Risiko (falls vorhanden)
+    const conf = r.sla?.conflicts || [];
+    if(conf.length){
+      if(y > pageH - margin - 70){
+        doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+      }
+      doc.setFont("helvetica","bold"); doc.setTextColor(180,60,60);
+      doc.text("SLA-Konflikte (Re-Planung erforderlich):", margin, y); y += 12;
+      doc.setFont("helvetica","normal"); doc.setTextColor(40,50,80);
+      const confText = conf.map(c=>`${c.step}: ${c.type}${c.taskId?(" (Task "+c.taskId+")"):""}`).join("; ");
+      const confLines = doc.splitTextToSize(confText, pageW - 2*margin);
+      doc.text(confLines, margin, y);
+      y += confLines.length*11 + 6;
+    }
+
+    doc.setDrawColor(210,215,228);
+    doc.line(margin, y, pageW - margin, y);
+    y += 12;
+  });
+
+  // 6) SLA Konflikte Übersicht
+  doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("6) SLA-Konflikte / Abhängigkeitsverletzungen (Übersicht)", margin, y); y += 10;
+
+  const conflicts = [];
+  for(const r of state.risks){
+    const cs = r.sla?.conflicts || [];
+    for(const c of cs){
+      conflicts.push({
+        riskId: r.id,
+        level: r.level,
+        step: c.step,
+        type: c.type,
+        taskId: c.taskId || (r.sla?.anchorsUsed?.[c.step]?.taskId || ""),
+        details: JSON.stringify(c)
+      });
+    }
+  }
+  doc.autoTable({
+    startY: y,
+    head: [["Risk","Stufe","Schritt","Konflikt","Anker-Task","Details"]],
+    body: conflicts.length
+      ? conflicts.map(c=>[c.riskId, c.level, c.step, c.type, c.taskId, c.details])
+      : [["—","—","—","Keine Konflikte erkannt","—","—"]],
+    styles:{ fontSize:8, cellPadding:4, overflow:"linebreak" },
+    headStyles:{ fillColor:[15,25,55] },
+    margin:{left:margin, right:margin},
+    didParseCell: (data)=>{
+      if(data.section==="body" && data.column.index===1){
+        const lvl = data.cell.text?.[0] || "";
+        const col = levelColor(lvl);
+        data.cell.styles.textColor = col;
+        data.cell.styles.fontStyle = "bold";
+      }
+    }
+  });
+
+  // 7) CPM Summary (Critical Path)
+  doc.addPage(); addHeader("Risikomanagement – Abschlussbericht"); y = 90;
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(15,25,55);
+  doc.text("7) Terminplan-Zusammenfassung (CPM) – Kritischer Pfad", margin, y); y += 14;
+
+  if(state.cpm && state.cpm.ok){
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(40,50,80);
+    doc.text(`Netto-Projektdauer (Tage): ${state.cpm.projectDuration}`, margin, y); y += 12;
+
+    const critical = state.cpm.tasks.filter(t=>t.Critical);
+    const rows = critical.map(t => ([t.id, t.name, t.module, String(t.dur), (t.pred||[]).join(";")]));
+    doc.autoTable({
+      startY: y,
+      head: [["ID","Kritische Tätigkeit","Modul","Dauer","Vorgänger"]],
+      body: rows.length ? rows : [["—","Keine kritischen Tätigkeiten ermittelt","—","—","—"]],
+      styles: { fontSize: 8, cellPadding: 4, overflow:"linebreak" },
+      headStyles: { fillColor: [15, 25, 55] },
+      margin: {left: margin, right: margin}
+    });
+  } else {
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(120,80,80);
+    doc.text("CPM konnte nicht berechnet werden (möglicher Zyklus in Vorgängern). Bitte Vorgängerketten prüfen.", margin, y);
+  }
+
+  // Footer: Seitenzahlen
+  const pageCount = doc.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(120,130,150);
+    doc.text(`Seite ${i}/${pageCount}`, pageW - margin, pageH - 20, {align:"right"});
+  }
+
+  const safeName = (state.project.name || "Risikomatrix").replace(/[^\w\-]+/g,"_").slice(0,60);
+  doc.save(`${safeName}_Abschlussbericht.pdf`);
+}
+document.getElementById("btnExportPDF").addEventListener("click", exportPDFReport);
+
+/* ============================================================
+   12) Init defaults
+   ============================================================ */
+(function init(){
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById("projectStart").value = today;
+
+  // optional baseline defaults
+  ["HSE_BAUSTELLV","GRID_TSO"].forEach(id=>{
+    const chk = document.getElementById("chk_"+id);
+    if(chk) chk.checked = true;
+  });
+
+  generate();
+})();
+</script>
+</body>
+</html>
